@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const UPLOAD_URL = 'https://api.muapi.ai/api/v1/upload_file';
-const MUAPI_API_KEY = '3456a9a4c8c29092fb685397babe6dca93ec07286d02e0894f7ad88bfa352e7c';
-
+const MUAPI_API_KEY = 'PASTE_MUAPI_API_KEY_HERE';
 export const runtime = 'nodejs';
 
 export async function POST(request) {
@@ -24,12 +23,15 @@ export async function POST(request) {
     );
   }
 
+  const uploadForm = new FormData();
+  uploadForm.append('file', file, file.name);
+
   let upstreamResponse;
   try {
     upstreamResponse = await fetch(UPLOAD_URL, {
       method: 'POST',
       headers: { 'x-api-key': MUAPI_API_KEY },
-      body: formData,
+      body: uploadForm,
     });
   } catch (error) {
     console.error('[Upload API] Muapi request failed:', error);
