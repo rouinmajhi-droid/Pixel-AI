@@ -44,11 +44,24 @@ export async function POST(request) {
     );
   }
 
+  const responseText = await upstreamResponse.text();
+  if (!upstreamResponse.ok) {
+    console.error(
+      `[Upload API] Muapi upload failed with status ${upstreamResponse.status}: ${responseText}`
+    );
+  }
+
   let data;
   try {
-    data = await upstreamResponse.json();
+    data = JSON.parse(responseText);
   } catch (error) {
     console.error('[Upload API] Muapi returned an invalid JSON response:', error);
+    if (!upstreamResponse.ok) {
+      return NextResponse.json(
+        { error: responseText || upstreamResponse.statusText },
+        { status: upstreamResponse.status }
+      );
+    }
     return NextResponse.json(
       { error: 'The upload service returned an invalid response.' },
       { status: 502 }
