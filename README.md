@@ -79,7 +79,7 @@ For a deep dive into the technical architecture and the philosophy behind the "I
 - **Smart Controls** — Dynamic aspect ratio, resolution/quality, and duration pickers that adapt to each model's capabilities (including t2i models with resolution or quality options)
 - **Generation History** — Browse, revisit, and download all past generations (persisted in browser storage)
 - **Image & Video Download** — One-click download of generated outputs in full resolution
-- **API Key Management** — User-provided keys stay in browser localStorage for direct Muapi calls; the upload service uses its separately configured server-side key
+- **API Key Management** — User-provided keys stay in browser localStorage for direct Muapi calls; uploads use a server-side environment variable
 - **Responsive Design** — Works seamlessly on desktop and mobile with dark glassmorphism UI
 
 ### 🖼️ Image Studio — Dual Mode
@@ -294,14 +294,7 @@ The app communicates with [Muapi.ai](https://muapi.ai) using a two-step pattern:
 
 Authentication uses the `x-api-key` header. During development, a Vite proxy handles CORS by routing `/api` requests to `https://api.muapi.ai`.
 
-File uploads use the Next.js `POST /api/upload` route, which loads the Muapi API key from encrypted Upstash Redis storage and forwards multipart form data to Muapi server-to-server. To configure it:
-
-1. Create an Upstash Redis database and copy its REST URL and REST token.
-2. In Vercel project settings, add `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, a strong `ADMIN_PASSWORD`, and `MUAPI_KEY_ENCRYPTION_SECRET` for the Production environment (and Preview if needed).
-3. Generate `MUAPI_KEY_ENCRYPTION_SECRET` as 32 random bytes encoded as 64 hexadecimal characters, for example with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`. Keep it stable and back it up, because changing it makes the stored key unreadable.
-4. Redeploy, open `/admin`, enter the admin password and Muapi key, and save.
-
-The admin panel only reports whether a key is configured and never returns the stored key. For multi-image models the full `images_list` array is forwarded to the API in one request.
+File uploads use the Next.js `POST /api/upload` route, which forwards multipart form data to Muapi server-to-server using the `MUAPI_API_KEY` environment variable. For local development, paste the key after `MUAPI_API_KEY=` in the root `.env.local` file and restart the dev server. This file is ignored by Git; never commit the actual key. Configure the same variable in your Vercel project's server-side environment variables for Production (and Preview if needed), then redeploy. Do not prefix it with `NEXT_PUBLIC_`. For multi-image models the full `images_list` array is forwarded to the API in one request.
 
 Lip sync jobs use the same two-step pattern: a dedicated `processLipSync()` method accepts `image_url` or `video_url` alongside `audio_url`, dispatches to the model's endpoint, and polls until the output video URL is available.
 
