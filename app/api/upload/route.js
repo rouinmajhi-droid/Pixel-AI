@@ -31,6 +31,10 @@ export async function POST(request) {
 
   let upstreamResponse;
   try {
+    console.log('[Upload API] Sending Muapi upload request:', {
+      headers: { 'x-api-key': '[REDACTED]' },
+      apiKeyConfigured: Boolean(apiKey),
+    });
     upstreamResponse = await fetch(UPLOAD_URL, {
       method: 'POST',
       headers: { 'x-api-key': apiKey },
