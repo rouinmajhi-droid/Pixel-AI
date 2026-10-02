@@ -121,15 +121,14 @@ export async function processLipSync(apiKey, params) {
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
 }
 
-export function uploadFile(apiKey, file, onProgress) {
+export function uploadFile(_apiKey, file, onProgress) {
     return new Promise((resolve, reject) => {
-        const url = `${BASE_URL}/api/v1/upload_file`;
+        const url = '/api/upload';
         const formData = new FormData();
         formData.append('file', file);
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', url);
-        xhr.setRequestHeader('x-api-key', apiKey);
 
         if (onProgress) {
             xhr.upload.onprogress = (event) => {
@@ -157,7 +156,7 @@ export function uploadFile(apiKey, file, onProgress) {
                 let detail = xhr.statusText;
                 try {
                     const errObj = JSON.parse(xhr.responseText);
-                    detail = errObj.detail || detail;
+                    detail = errObj.error || errObj.detail || detail;
                 } catch (e) {
                     // fallback to statusText
                 }
@@ -169,4 +168,3 @@ export function uploadFile(apiKey, file, onProgress) {
         xhr.send(formData);
     });
 }
-

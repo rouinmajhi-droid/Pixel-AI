@@ -294,7 +294,7 @@ The app communicates with [Muapi.ai](https://muapi.ai) using a two-step pattern:
 
 Authentication uses the `x-api-key` header. During development, a Vite proxy handles CORS by routing `/api` requests to `https://api.muapi.ai`.
 
-File uploads use `POST /api/v1/upload_file` (multipart/form-data) and return a hosted URL that is passed to image-conditioned models. For multi-image models the full `images_list` array is forwarded to the API in one request.
+File uploads use the Next.js `POST /api/upload` route, which forwards multipart form data to Muapi server-to-server and returns the hosted URL passed to image-conditioned models. Set `MUAPI_API_KEY` as a server-side environment variable in your Vercel project for uploads to work; do not prefix it with `NEXT_PUBLIC_`. For multi-image models the full `images_list` array is forwarded to the API in one request.
 
 Lip sync jobs use the same two-step pattern: a dedicated `processLipSync()` method accepts `image_url` or `video_url` alongside `audio_url`, dispatches to the model's endpoint, and polls until the output video URL is available.
 
