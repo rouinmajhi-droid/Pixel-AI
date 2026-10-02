@@ -1,18 +1,11 @@
 import { NextResponse } from 'next/server';
 
 const UPLOAD_URL = 'https://api.muapi.ai/api/v1/upload_file';
+const MUAPI_API_KEY = 'PASTE_MUAPI_API_KEY_HERE';
 
 export const runtime = 'nodejs';
 
 export async function POST(request) {
-  const apiKey = process.env.MUAPI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: 'MUAPI_API_KEY is not configured on the server.' },
-      { status: 500 }
-    );
-  }
-
   let formData;
   try {
     formData = await request.formData();
@@ -35,7 +28,7 @@ export async function POST(request) {
   try {
     upstreamResponse = await fetch(UPLOAD_URL, {
       method: 'POST',
-      headers: { 'x-api-key': apiKey },
+      headers: { 'x-api-key': MUAPI_API_KEY },
       body: formData,
     });
   } catch (error) {
