@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const UPLOAD_URL = 'https://api.muapi.ai/api/v1/upload_file';
-const MUAPI_API_KEY = 'c2acb2ae53db8b3462979ec8cc9711fe32a4302614358d991b7b51540721d462';
+const MUAPI_API_KEY = '3456a9a4c8c29092fb685397babe6dca93ec07286d02e0894f7ad88bfa352e7c';
 
 export const runtime = 'nodejs';
 
