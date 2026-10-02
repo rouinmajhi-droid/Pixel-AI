@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const UPLOAD_URL = 'https://api.muapi.ai/api/v1/upload_file';
-const MUAPI_API_KEY = '14ede192bf9c42760e5a4b06ede8a14a70d2d307d57a33bee8c98d13dbabc599';
+const UPLOAD_URL = 'https://api.muapi.ai/api/v1/upload file';
+const MUAPI_API_KEY = 'b81b230e8849959bc1e9eeb8d50a14f851e6563c4f00ae8714b0f53b1b9e2a22';
 export const runtime = 'nodejs';
 
 export async function POST(request) {
@@ -34,9 +34,10 @@ export async function POST(request) {
       body: uploadForm,
     });
   } catch (error) {
-    console.error('[Upload API] Muapi request failed:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[Upload API] Muapi request failed:', message);
     return NextResponse.json(
-      { error: 'Unable to reach the upload service.' },
+      { error: message },
       { status: 502 }
     );
   }
@@ -46,6 +47,10 @@ export async function POST(request) {
     console.error(
       `[Upload API] Muapi upload failed with status ${upstreamResponse.status}: ${responseText}`
     );
+    return NextResponse.json(
+      { error: responseText || upstreamResponse.statusText },
+      { status: upstreamResponse.status }
+    );
   }
 
   let data;
@@ -53,12 +58,6 @@ export async function POST(request) {
     data = JSON.parse(responseText);
   } catch (error) {
     console.error('[Upload API] Muapi returned an invalid JSON response:', error);
-    if (!upstreamResponse.ok) {
-      return NextResponse.json(
-        { error: responseText || upstreamResponse.statusText },
-        { status: upstreamResponse.status }
-      );
-    }
     return NextResponse.json(
       { error: 'The upload service returned an invalid response.' },
       { status: 502 }
