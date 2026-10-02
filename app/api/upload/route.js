@@ -1,12 +1,25 @@
 import { NextResponse } from 'next/server';
+import { getStoredMuapiApiKey } from '@/lib/muapi-key-storage';
 
 const UPLOAD_URL = 'https://api.muapi.ai/api/v1/upload_file';
 
+export const runtime = 'nodejs';
+
 export async function POST(request) {
-  const apiKey = process.env.MUAPI_API_KEY;
+  let apiKey;
+  try {
+    apiKey = await getStoredMuapiApiKey();
+  } catch (error) {
+    console.error('[Upload API] Unable to load Muapi key from secure storage:', error.message);
+    return NextResponse.json(
+      { error: 'Unable to access secure Muapi key storage.' },
+      { status: 503 }
+    );
+  }
+
   if (!apiKey) {
     return NextResponse.json(
-      { error: 'MUAPI_API_KEY is not configured on the server.' },
+      { error: 'No Muapi API key is configured. Save one in the admin panel.' },
       { status: 500 }
     );
   }
@@ -31,10 +44,6 @@ export async function POST(request) {
 
   let upstreamResponse;
   try {
-    console.log('[Upload API] Sending Muapi upload request:', {
-      headers: { 'x-api-key': '[REDACTED]' },
-      apiKeyConfigured: Boolean(apiKey),
-    });
     upstreamResponse = await fetch(UPLOAD_URL, {
       method: 'POST',
       headers: { 'x-api-key': apiKey },
